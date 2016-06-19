@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.abirshukla.souschef">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/cheficon"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".voice"
+            android:label="@string/title_activity_voice"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".scrollVoice"
+            android:label="@string/title_activity_scroll_voice"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ac1"
+            android:label="@string/title_activity_ac1"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".test"
+            android:label="@string/title_activity_test"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".speaker"
+            android:label="@string/title_activity_speaker"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".sample"
+            android:label="@string/title_activity_sample"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".error"
+            android:label="@string/title_activity_error"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".sett"></activity>
+    </application>
+
+</manifest>
