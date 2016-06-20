@@ -4,3 +4,5 @@ gradle/
 gradle*
 local.properties
 settings.gradle
+.idea/
+.gradle/
