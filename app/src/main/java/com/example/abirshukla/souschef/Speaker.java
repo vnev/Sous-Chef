@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.design.widget.Snackbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -113,7 +114,7 @@ public class Speaker extends Activity implements DialogInterface.OnClickListener
                 myTTS.setLanguage(Locale.US);
         }
         else if (initStatus == TextToSpeech.ERROR) {
-            Toast.makeText(this, "Sorry! Text To Speech failed...", Toast.LENGTH_LONG).show();
+            Snackbar.make(said, "Text-to-Speech failed...", Snackbar.LENGTH_LONG).show();
         }
     }
 

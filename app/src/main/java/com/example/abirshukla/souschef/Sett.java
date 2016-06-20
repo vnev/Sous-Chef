@@ -2,13 +2,16 @@ package com.example.abirshukla.souschef;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 public class Sett extends AppCompatActivity {
+
     EditText editText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,10 +23,10 @@ public class Sett extends AppCompatActivity {
     }
     public void sub(View view) {
         String email = editText.getText().toString();
-        System.out.print("New Email: "+email);
-        DataForUser.email = "";
+        System.out.print("New Email: " + email);
         DataForUser.email = email;
-        Toast.makeText(this, "Email Saved", Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.editText), "Email has been saved", Snackbar.LENGTH_SHORT)
+                .show();
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
