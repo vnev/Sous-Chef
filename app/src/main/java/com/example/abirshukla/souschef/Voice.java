@@ -7,12 +7,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.koushikdutta.async.future.FutureCallback;
@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 
-public class voice extends Activity {
+public class Voice extends Activity {
+
     TextView name;
     ProgressDialog pd;
     TextView info;
@@ -32,8 +33,9 @@ public class voice extends Activity {
     String nameOfDish;
     String namError;
     String subject;
-    Firebase myFirebaseRef;
+//    Firebase myFirebaseRef;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +58,7 @@ public class voice extends Activity {
         name.setText(nameOfDish + " by " + creator);
         pd.dismiss();
         info = (TextView) findViewById(R.id.info);
-        System.out.println("Code is: "+code);
+        System.out.println("Code is: " + code);
         String time = getTime(code);
         String servings = getServing(code);
         String ing = getIngredients(code);
@@ -64,7 +66,7 @@ public class voice extends Activity {
         String link = dish.getString("link");
         String infoText = time+"\n\n"+servings+"\n\n"+ing+"\n\n"+ins;
         if (infoText.contains("<html>")) {
-            Intent er = new Intent(this,error.class);
+            Intent er = new Intent(this,Error.class);
             er.putExtra("name",namError);
             startActivity(er);
         }
@@ -79,6 +81,7 @@ public class voice extends Activity {
             }
         });
     }
+
     public String getName(String code) {
         int index = code.indexOf("<h1 itemprop=\"name\">");
         int index2 = code.indexOf(">",index);
@@ -87,6 +90,7 @@ public class voice extends Activity {
             return "<html>";
         return code.substring(index2+1,index3);
     }
+
     private void promptSpeechInput() {
         String speech_prompt = "What Do you want to know";
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -98,11 +102,12 @@ public class voice extends Activity {
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            Toast.makeText(getApplicationContext(), "Speech Not Supported",
-                    Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.title), "Speech not supported", Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String res = "";
@@ -124,12 +129,13 @@ public class voice extends Activity {
         respond(res);
 
     }
+
     public void respond(String res) {
         res = res.toLowerCase();
-        Intent speak = new Intent(this, speaker.class);
+        Intent speak = new Intent(this, Speaker.class);
         String say = "";
         if (res.contains("email") || res.contains("send")) {
-            String name = dataForUser.getEmail();
+            String name = DataForUser.getEmail();
             String sub = "";
             String mess = "";
             if (res.contains("long") || res.contains("time")) {
@@ -155,7 +161,8 @@ public class voice extends Activity {
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));
                 } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                            Snackbar.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -170,7 +177,8 @@ public class voice extends Activity {
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));
                 } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                            Snackbar.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -199,7 +207,8 @@ public class voice extends Activity {
                         try {
                             startActivity(Intent.createChooser(i, "Send mail..."));
                         } catch (android.content.ActivityNotFoundException ex) {
-                            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                                    Snackbar.LENGTH_LONG).show();
                         }
                         return;
                     }
@@ -214,7 +223,8 @@ public class voice extends Activity {
                         try {
                             startActivity(Intent.createChooser(i, "Send mail..."));
                         } catch (android.content.ActivityNotFoundException ex) {
-                            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                                    Snackbar.LENGTH_LONG).show();
                         }
                         return;
 
@@ -334,6 +344,7 @@ public class voice extends Activity {
         speak.putExtra("subject",subject);
         startActivity(speak);
     }
+
     public void goToMap(View view) {
         // Search for restaurants nearby
         Uri gmmIntentUri = Uri.parse("geo:0,0?q=Grocery");
@@ -341,6 +352,7 @@ public class voice extends Activity {
         mapIntent.setPackage("com.google.android.apps.maps");
         startActivity(mapIntent);
     }
+
     public void getHTML(String mess,String name, String sub) {
         mess = mess.replace(" ","%20");
         sub = sub.replace(" ","%20");
@@ -359,6 +371,7 @@ public class voice extends Activity {
                     }
                 });
     }
+
     public String getTime(String code) {
         int index = code.indexOf("Total Time:");
         int index2 = code.indexOf("Prep:");
@@ -376,6 +389,7 @@ public class voice extends Activity {
         hm.put("time", res);
         return res;
     }
+
     public String takeOutHtml(String str) {
         int check = 0;
         String res = "";
@@ -396,6 +410,7 @@ public class voice extends Activity {
 
         return adjusted;
     }
+
     public String getServing(String code) {
         int index = code.indexOf("Yield:");
         if (index == -1) {
@@ -466,17 +481,14 @@ public class voice extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
+
     public void takeToSample(View view) {
-        Intent sample = new Intent(this, com.example.abirshukla.souschef.sample.class);
+        Intent sample = new Intent(this, com.example.abirshukla.souschef.Sample.class);
         startActivity(sample);
     }
-
-
-
 }
