@@ -16,7 +16,8 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.Locale;
 
-public class speaker extends Activity implements DialogInterface.OnClickListener, TextToSpeech.OnInitListener, View.OnClickListener {
+public class Speaker extends Activity implements DialogInterface.OnClickListener, TextToSpeech.OnInitListener, View.OnClickListener {
+
     //TTS object
     private TextToSpeech myTTS;
     private TextToSpeech myTTSA;
@@ -26,8 +27,9 @@ public class speaker extends Activity implements DialogInterface.OnClickListener
     Intent a;
     String url;
     //create the Activity
-    public void onCreate(Bundle savedInstanceState) {
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speaker);
         //listen for clicks
@@ -43,7 +45,7 @@ public class speaker extends Activity implements DialogInterface.OnClickListener
         System.out.println("Res: " + res);
         said.setText(res);
         chefSpeak(res);
-        a = new Intent(this, ac1.class);
+        a = new Intent(this, Ac1.class);
         a.putExtra("nameOfDish", nameOfDish);
         String subject = wor.getString("subject");
         a.putExtra("subject",subject);
@@ -66,11 +68,13 @@ public class speaker extends Activity implements DialogInterface.OnClickListener
             }
         });
     }
+
     //respond to button clicks
+    @Override
     public void onClick(View v) {
 
         //get the text entered
-        EditText enteredText = (EditText)findViewById(R.id.enter);
+        EditText enteredText = (EditText) findViewById(R.id.enter);
         String words = enteredText.getText().toString();
         speakWords(words);
     }
@@ -83,6 +87,7 @@ public class speaker extends Activity implements DialogInterface.OnClickListener
     }
 
     //act on result of TTS data check
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == MY_DATA_CHECK_CODE) {

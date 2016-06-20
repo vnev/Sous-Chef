@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 
-public class voice extends Activity {
+public class Voice extends Activity {
+
     TextView name;
     ProgressDialog pd;
     TextView info;
@@ -34,6 +35,7 @@ public class voice extends Activity {
     String subject;
     Firebase myFirebaseRef;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +58,7 @@ public class voice extends Activity {
         name.setText(nameOfDish + " by " + creator);
         pd.dismiss();
         info = (TextView) findViewById(R.id.info);
-        System.out.println("Code is: "+code);
+        System.out.println("Code is: " + code);
         String time = getTime(code);
         String servings = getServing(code);
         String ing = getIngredients(code);
@@ -64,7 +66,7 @@ public class voice extends Activity {
         String link = dish.getString("link");
         String infoText = time+"\n\n"+servings+"\n\n"+ing+"\n\n"+ins;
         if (infoText.contains("<html>")) {
-            Intent er = new Intent(this,error.class);
+            Intent er = new Intent(this,Error.class);
             er.putExtra("name",namError);
             startActivity(er);
         }
@@ -126,10 +128,10 @@ public class voice extends Activity {
     }
     public void respond(String res) {
         res = res.toLowerCase();
-        Intent speak = new Intent(this, speaker.class);
+        Intent speak = new Intent(this, Speaker.class);
         String say = "";
         if (res.contains("email") || res.contains("send")) {
-            String name = dataForUser.getEmail();
+            String name = DataForUser.getEmail();
             String sub = "";
             String mess = "";
             if (res.contains("long") || res.contains("time")) {
@@ -473,7 +475,7 @@ public class voice extends Activity {
         startActivity(i);
     }
     public void takeToSample(View view) {
-        Intent sample = new Intent(this, com.example.abirshukla.souschef.sample.class);
+        Intent sample = new Intent(this, com.example.abirshukla.souschef.Sample.class);
         startActivity(sample);
     }
 

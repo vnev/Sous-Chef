@@ -23,18 +23,20 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
     private final int REQ_CODE_SPEECH_INPUT = 100;
     Intent a;
     SharedPreferences sharedPref;
     ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         if (sharedPref != null) {
             String email = sharedPref.getString("email", "");
-            if (!email.equals("") && dataForUser.getEmail().equals("")) {
+            if (!email.equals("") && DataForUser.getEmail().equals("")) {
                 System.out.println(email);
-                dataForUser.setEmail(email);
+                DataForUser.setEmail(email);
             }
         }
         super.onCreate(savedInstanceState);
@@ -43,16 +45,16 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("Sous Chef");
         toolbar.hideOverflowMenu();
         setSupportActionBar(toolbar);
-        if (dataForUser.getEmail().equals("")) {
-            Intent se = new Intent(MainActivity.this,sett.class);
+        if (DataForUser.getEmail().equals("")) {
+            Intent se = new Intent(MainActivity.this,Sett.class);
             startActivity(se);
         }
-        String ea = dataForUser.getEmail();
+        String ea = DataForUser.getEmail();
         Toast.makeText(this, ea, Toast.LENGTH_SHORT).show();
         ImageView im = (ImageView) findViewById(R.id.imageView);
         Button voiceB = (Button) findViewById(R.id.button);
 
-        a = new Intent(MainActivity.this, ac1.class);
+        a = new Intent(MainActivity.this, Ac1.class);
         pd = new ProgressDialog(this);
         pd.setMessage("Acquiring data for your dish...");
 
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent se = new Intent(MainActivity.this,sett.class);
+            Intent se = new Intent(MainActivity.this,Sett.class);
             startActivity(se);
         }
 
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("email",dataForUser.getEmail());
+        savedInstanceState.putString("email",DataForUser.getEmail());
         super.onSaveInstanceState(savedInstanceState);
 
     }
@@ -158,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         SharedPreferences.Editor editor = sharedPref.edit();
-        String email = dataForUser.getEmail();
+        String email = DataForUser.getEmail();
         editor.putString("email",email);
         editor.commit();
         super.onDestroy();
