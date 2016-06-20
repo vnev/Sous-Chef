@@ -3,21 +3,18 @@ package com.example.abirshukla.souschef;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-public class Ac1 extends AppCompatActivity {
-
+public class ac1 extends AppCompatActivity {
     Intent f;
     String nameOfDish;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle c = getIntent().getExtras();
-        f = new Intent(this, Voice.class);
+        f = new Intent(this,voice.class);
         String result = c.getString("code");
         nameOfDish = c.getString("nameOfDish");
         f.putExtra("nameOfDish",nameOfDish);
@@ -43,7 +40,7 @@ public class Ac1 extends AppCompatActivity {
                     public void onCompleted(Exception e, String result) {
                         System.out.println("Result: " + result);
                         if (result.contains("No Error") || result.contains("http://www.foodnetwork.com/</p>")) {
-                            Intent er = new Intent(Ac1.this, Error.class);
+                            Intent er = new Intent(ac1.this,error.class);
                             er.putExtra("name",nameOfDish);
                             startActivity(er);
                             return;

@@ -6,13 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
-public class ScrollVoice extends AppCompatActivity {
-
+public class scrollVoice extends AppCompatActivity {
     TextView name;
     ProgressDialog pd;
     TextView youSaid;
     TextView info;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

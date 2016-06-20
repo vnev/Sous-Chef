@@ -9,12 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class Error extends AppCompatActivity {
-
+public class error extends AppCompatActivity {
     TextView textView;
     Button button;
     String name;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
