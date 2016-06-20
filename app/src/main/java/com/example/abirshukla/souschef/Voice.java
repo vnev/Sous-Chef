@@ -3,18 +3,16 @@ package com.example.abirshukla.souschef;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.koushikdutta.async.future.FutureCallback;
@@ -23,19 +21,10 @@ import com.koushikdutta.ion.Ion;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Properties;
-
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 
-public class voice extends Activity {
+public class Voice extends Activity {
+
     TextView name;
     ProgressDialog pd;
     TextView info;
@@ -44,12 +33,9 @@ public class voice extends Activity {
     String nameOfDish;
     String namError;
     String subject;
-    Firebase myFirebaseRef;
-    ProgressDialog pdialog = null;
-    Session session = null;
-    Context context = null;
-    String rec, subjectEmail, textMessage;
+//    Firebase myFirebaseRef;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +58,7 @@ public class voice extends Activity {
         name.setText(nameOfDish + " by " + creator);
         pd.dismiss();
         info = (TextView) findViewById(R.id.info);
-        System.out.println("Code is: "+code);
+        System.out.println("Code is: " + code);
         String time = getTime(code);
         String servings = getServing(code);
         String ing = getIngredients(code);
@@ -80,7 +66,7 @@ public class voice extends Activity {
         String link = dish.getString("link");
         String infoText = time+"\n\n"+servings+"\n\n"+ing+"\n\n"+ins;
         if (infoText.contains("<html>")) {
-            Intent er = new Intent(this,error.class);
+            Intent er = new Intent(this,Error.class);
             er.putExtra("name",namError);
             startActivity(er);
         }
@@ -95,6 +81,7 @@ public class voice extends Activity {
             }
         });
     }
+
     public String getName(String code) {
         int index = code.indexOf("<h1 itemprop=\"name\">");
         int index2 = code.indexOf(">",index);
@@ -103,6 +90,7 @@ public class voice extends Activity {
             return "<html>";
         return code.substring(index2+1,index3);
     }
+
     private void promptSpeechInput() {
         String speech_prompt = "What Do you want to know";
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -114,11 +102,12 @@ public class voice extends Activity {
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            Toast.makeText(getApplicationContext(), "Speech Not Supported",
-                    Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.title), "Speech not supported", Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String res = "";
@@ -140,248 +129,104 @@ public class voice extends Activity {
         respond(res);
 
     }
+
     public void respond(String res) {
         res = res.toLowerCase();
-        Intent speak = new Intent(this, speaker.class);
+        Intent speak = new Intent(this, Speaker.class);
         String say = "";
         if (res.contains("email") || res.contains("send")) {
-            String name = dataForUser.getEmail();
+            String name = DataForUser.getEmail();
             String sub = "";
             String mess = "";
             if (res.contains("long") || res.contains("time")) {
                 sub = "Time for "+nameOfDish;
                 mess = hm.get("time").toString();
+                getHTML(mess,name, sub);
                 say = "Email Sent with time";
-                subject = "time";
-
-
-                rec = name;
-                subjectEmail = sub;
-                textMessage = mess;
-
-                Properties props = new Properties();
-                props.put("mail.smtp.host", "smtp.gmail.com");
-                props.put("mail.smtp.socketFactory.port", "465");
-                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.port", "465");
-
-                session = Session.getDefaultInstance(props, new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                    }
-                });
-
-
-                RetreiveFeedTask task = new RetreiveFeedTask();
-                task.execute();
-
-
-
-
-
-
-
-
             }
             else if (res.contains("yield") || res.contains("feed") || res.contains("serv")) {
                 sub = "Servings for "+ nameOfDish;
                 mess = say = hm.get("servings").toString();
+                getHTML(mess,name, sub);
                 say = "Email Sent with servings";
-
-                subject = "servings";
-
-
-
-                rec = name;
-                subjectEmail = sub;
-                textMessage = mess;
-
-                Properties props = new Properties();
-                props.put("mail.smtp.host", "smtp.gmail.com");
-                props.put("mail.smtp.socketFactory.port", "465");
-                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.port", "465");
-
-                session = Session.getDefaultInstance(props, new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                    }
-                });
-
-
-                RetreiveFeedTask task = new RetreiveFeedTask();
-                task.execute();
-
-
-
-
-
-
             }
             else if (res.contains("ingredients")) {
                 sub = "Ingredients for "+ nameOfDish;
-                say = "Email Sent with Ingredients";
-                mess = hm.get("ing").toString();
-                subject = "ing";
-                rec = name;
-                subjectEmail = sub;
-                textMessage = mess;
-
-                Properties props = new Properties();
-                props.put("mail.smtp.host", "smtp.gmail.com");
-                props.put("mail.smtp.socketFactory.port", "465");
-                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.port", "465");
-
-                session = Session.getDefaultInstance(props, new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                    }
-                });
-
-
-                RetreiveFeedTask task = new RetreiveFeedTask();
-                task.execute();
+                say = "Email Sent with Instructions";
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{name});
+                i.putExtra(Intent.EXTRA_SUBJECT, sub);
+                i.putExtra(Intent.EXTRA_TEXT, hm.get("ing").toString());
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                return;
             }
             else if(res.contains("instructions") || res.contains("step")) {
                 sub = "Instructions for "+ nameOfDish;
                 say = "Email Sent with Instructions";
-                mess= hm.get("insWhole").toString();
-                subject = "insWhole";
-
-                rec = name;
-                subjectEmail = sub;
-                textMessage = mess;
-
-                Properties props = new Properties();
-                props.put("mail.smtp.host", "smtp.gmail.com");
-                props.put("mail.smtp.socketFactory.port", "465");
-                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.port", "465");
-
-                session = Session.getDefaultInstance(props, new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                    }
-                });
-
-
-                RetreiveFeedTask task = new RetreiveFeedTask();
-                task.execute();
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{name});
+                i.putExtra(Intent.EXTRA_SUBJECT, sub);
+                i.putExtra(Intent.EXTRA_TEXT   , hm.get("insWhole").toString());
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                return;
             }
             else if (res.contains("that") || res.contains("those") || res.contains("them")) {
                 if (!subject.equals("")) {
                     if (subject.equals("time")) {
                         sub = "Time for "+nameOfDish;
                         mess = hm.get("time").toString();
+                        getHTML(mess,name, sub);
                         say = "Email Sent with time";
-
-
-                        rec = name;
-                        subjectEmail = sub;
-                        textMessage = mess;
-
-                        Properties props = new Properties();
-                        props.put("mail.smtp.host", "smtp.gmail.com");
-                        props.put("mail.smtp.socketFactory.port", "465");
-                        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                        props.put("mail.smtp.auth", "true");
-                        props.put("mail.smtp.port", "465");
-
-                        session = Session.getDefaultInstance(props, new Authenticator() {
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                            }
-                        });
-
-
-                        RetreiveFeedTask task = new RetreiveFeedTask();
-                        task.execute();
                     }
                     else if (subject.equals("servings")) {
                         sub = "Servings for "+ nameOfDish;
                         mess = say = hm.get("servings").toString();
+                        getHTML(mess,name, sub);
                         say = "Email Sent with servings";
-
-
-                        rec = name;
-                        subjectEmail = sub;
-                        textMessage = mess;
-
-                        Properties props = new Properties();
-                        props.put("mail.smtp.host", "smtp.gmail.com");
-                        props.put("mail.smtp.socketFactory.port", "465");
-                        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                        props.put("mail.smtp.auth", "true");
-                        props.put("mail.smtp.port", "465");
-
-                        session = Session.getDefaultInstance(props, new Authenticator() {
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                            }
-                        });
-
-
-                        RetreiveFeedTask task = new RetreiveFeedTask();
-                        task.execute();
                     }
                     else if (subject.equals("ing")) {
                         sub = "Ingredients for "+ nameOfDish;
-                        say = "Email Sent with Ingredients";
-                        mess = hm.get("ing").toString();
-
-
-
-                        rec = name;
-                        subjectEmail = sub;
-                        textMessage = mess;
-
-                        Properties props = new Properties();
-                        props.put("mail.smtp.host", "smtp.gmail.com");
-                        props.put("mail.smtp.socketFactory.port", "465");
-                        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                        props.put("mail.smtp.auth", "true");
-                        props.put("mail.smtp.port", "465");
-
-                        session = Session.getDefaultInstance(props, new Authenticator() {
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                            }
-                        });
-
-
-                        RetreiveFeedTask task = new RetreiveFeedTask();
-                        task.execute();
+                        say = "Email Sent with Instructions";
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("message/rfc822");
+                        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{name});
+                        i.putExtra(Intent.EXTRA_SUBJECT, sub);
+                        i.putExtra(Intent.EXTRA_TEXT   , hm.get("ing").toString());
+                        try {
+                            startActivity(Intent.createChooser(i, "Send mail..."));
+                        } catch (android.content.ActivityNotFoundException ex) {
+                            Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                                    Snackbar.LENGTH_LONG).show();
+                        }
+                        return;
                     }
                     else if(subject.equals("insWhole") || subject.equals("insArr")) {
                         sub = "Instructions for "+ nameOfDish;
                         say = "Email Sent with Instructions";
-                        mess = hm.get("insWhole").toString();
-
-                        rec = name;
-                        subjectEmail = sub;
-                        textMessage = mess;
-
-                        Properties props = new Properties();
-                        props.put("mail.smtp.host", "smtp.gmail.com");
-                        props.put("mail.smtp.socketFactory.port", "465");
-                        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                        props.put("mail.smtp.auth", "true");
-                        props.put("mail.smtp.port", "465");
-
-                        session = Session.getDefaultInstance(props, new Authenticator() {
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("yoursouschef1@gmail.com", "aadi2247");
-                            }
-                        });
-
-
-                        RetreiveFeedTask task = new RetreiveFeedTask();
-                        task.execute();
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("message/rfc822");
+                        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{name});
+                        i.putExtra(Intent.EXTRA_SUBJECT, sub);
+                        i.putExtra(Intent.EXTRA_TEXT   , hm.get("insWhole").toString());
+                        try {
+                            startActivity(Intent.createChooser(i, "Send mail..."));
+                        } catch (android.content.ActivityNotFoundException ex) {
+                            Snackbar.make(findViewById(R.id.title), "No mail clients installed...",
+                                    Snackbar.LENGTH_LONG).show();
+                        }
+                        return;
 
                     }
                     else {
@@ -499,6 +344,7 @@ public class voice extends Activity {
         speak.putExtra("subject",subject);
         startActivity(speak);
     }
+
     public void goToMap(View view) {
         // Search for restaurants nearby
         Uri gmmIntentUri = Uri.parse("geo:0,0?q=Grocery");
@@ -506,6 +352,7 @@ public class voice extends Activity {
         mapIntent.setPackage("com.google.android.apps.maps");
         startActivity(mapIntent);
     }
+
     public void getHTML(String mess,String name, String sub) {
         mess = mess.replace(" ","%20");
         sub = sub.replace(" ","%20");
@@ -524,6 +371,7 @@ public class voice extends Activity {
                     }
                 });
     }
+
     public String getTime(String code) {
         int index = code.indexOf("Total Time:");
         int index2 = code.indexOf("Prep:");
@@ -541,6 +389,7 @@ public class voice extends Activity {
         hm.put("time", res);
         return res;
     }
+
     public String takeOutHtml(String str) {
         int check = 0;
         String res = "";
@@ -561,6 +410,7 @@ public class voice extends Activity {
 
         return adjusted;
     }
+
     public String getServing(String code) {
         int index = code.indexOf("Yield:");
         if (index == -1) {
@@ -631,42 +481,14 @@ public class voice extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
+
     public void takeToSample(View view) {
-        Intent sample = new Intent(this, com.example.abirshukla.souschef.sample.class);
+        Intent sample = new Intent(this, com.example.abirshukla.souschef.Sample.class);
         startActivity(sample);
     }
-
-    class RetreiveFeedTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            try{
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress("yoursouschef1@gmail.com"));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(rec));
-                message.setSubject(subjectEmail);
-                message.setContent(textMessage, "text/html; charset=utf-8");
-                Transport.send(message);
-            } catch(MessagingException e) {
-                e.printStackTrace();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            Toast.makeText(getApplicationContext(), "Message sent", Toast.LENGTH_LONG).show();
-        }
-    }
-
 }
